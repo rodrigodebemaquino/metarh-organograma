@@ -176,24 +176,20 @@ const App: React.FC = () => {
               {/* Decorative Orbits (Elliptical) */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none opacity-20">
                 <svg className="absolute w-full h-full overflow-visible">
-                  <ellipse cx="50%" cy="50%" rx="600" ry="400" fill="none" stroke="#470082" strokeWidth="1" strokeDasharray="4 4" />
+                  <ellipse cx="50%" cy="50%" rx="600" ry="340" fill="none" stroke="#470082" strokeWidth="1" strokeDasharray="4 4" />
                 </svg>
               </div>
 
               {/* Strategic Areas (Orbiting with 3 Top / 3 Bottom) */}
               <div className="absolute inset-0 pointer-events-none z-30">
                 {STRATEGIC_AREAS.map((area, index) => {
-                  // Fixed Angles: 3 Top (-150, -90, -30), 3 Bottom (150, 90, 30)
-                  const angles = [-150, -90, -30, 30, 90, 150];
-                  // Map indices to these angles clearly.
-                  // Indices: 0->-150, 1->-90, 2->-30 (Top Left to Right)
-                  // Indices: 3->30, 4->90, 5->150 (Bottom Right to Left? Or 150->90->30?)
-                  // Let's layout: Top Left (-150), Top (-90), Top Right (-30). Bottom Right (30), Bottom (90), Bottom Left (150).
+                  // Tighter grouping angles: Top (-125, -90, -55), Bottom (55, 90, 125)
+                  const angles = [-125, -90, -55, 55, 90, 125];
                   const currentAngleDeg = angles[index % 6];
                   const angleRad = (currentAngleDeg) * (Math.PI / 180);
 
                   const radiusX = 600;
-                  const radiusY = 400;
+                  const radiusY = 340; // Reduced Y radius
                   const x = Math.cos(angleRad) * radiusX;
                   const y = Math.sin(angleRad) * radiusY;
 
@@ -250,32 +246,43 @@ const App: React.FC = () => {
                       className={`
                         relative flex flex-col bg-white rounded-[40px] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.05)] cursor-pointer
                         transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] border border-slate-100 group
-                        ${isExpanded ? 'w-[280px] h-auto z-40 scale-105 shadow-[0_40px_100px_rgba(0,0,0,0.1)]' : 'w-[280px] h-[360px] hover:-translate-y-2 hover:shadow-[0_30px_80px_rgba(0,0,0,0.08)]'}
+                        ${isExpanded ? 'w-[280px] h-auto z-40 scale-105 shadow-[0_40px_100px_rgba(0,0,0,0.1)]' : 'w-[280px] h-[220px] hover:-translate-y-2 hover:shadow-[0_30px_80px_rgba(0,0,0,0.08)]'}
                       `}
                     >
                       <div
                         className={`
-                          p-8 relative overflow-hidden flex flex-col items-center text-center gap-6 w-full h-full
+                          p-8 relative overflow-hidden flex flex-col items-center text-center gap-4 w-full h-full
                         `}
                         style={{ backgroundColor: isExpanded ? 'white' : area.color }}
                       >
                         <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-black/10 pointer-events-none mix-blend-overlay" />
 
-                        <h3 className={`text-2xl font-black leading-tight tracking-tight z-10 drop-shadow-sm transition-colors duration-500 mt-auto mb-4 ${isExpanded ? 'text-[#470082]' : 'text-white'}`}>
+                        <h3 className={`text-2xl font-black leading-tight tracking-tight z-10 drop-shadow-sm transition-colors duration-500 mt-auto ${isExpanded ? 'text-[#470082] mb-0' : 'text-white mb-2'}`}>
                           {area.name}
                         </h3>
 
-                        <div className={`
-                           w-14 h-14 rounded-full flex items-center justify-center z-10 transition-all duration-500 shadow-md group-hover:scale-110 mb-auto
-                           ${isExpanded ? 'bg-[#470082] text-white rotate-45' : 'bg-white/20 backdrop-blur-md text-white border border-white/40'}
-                         `}>
-                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14" /></svg>
-                        </div>
+                        {/* Chevron expanding indicator */}
+                        {!isExpanded && (
+                          <div className="flex flex-col items-center gap-2 mb-auto animate-in fade-in duration-500">
+                            <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/40">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+                            </div>
+                            <span className="text-[10px] font-bold text-white/80 uppercase tracking-widest">Clique para expandir</span>
+                          </div>
+                        )}
+
+                        {isExpanded && (
+                          <div className="absolute top-6 right-6">
+                            <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 rotate-180">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+                            </div>
+                          </div>
+                        )}
 
                         {/* Collapsible Content */}
                         <div className={`
                             w-full transition-all duration-700 overflow-hidden
-                            ${isExpanded ? 'max-h-[500px] opacity-100 mt-0 pb-2' : 'max-h-0 opacity-0'}
+                            ${isExpanded ? 'max-h-[500px] opacity-100 mt-2 pb-2' : 'max-h-0 opacity-0'}
                          `}>
                           <p className="text-[#6E6E73] text-base font-medium leading-relaxed italic">
                             "{area.description}"
