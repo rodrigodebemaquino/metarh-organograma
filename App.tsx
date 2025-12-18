@@ -237,10 +237,10 @@ const App: React.FC = () => {
                       {activeStrategicPopupId === area.id && (
                         <div className={`
                           absolute w-[320px] bg-[#470082] text-white p-6 rounded-[24px] shadow-[0_50px_100px_rgba(0,0,0,0.3)] z-[100] animate-in fade-in zoom-in-95 duration-300
-                          ${isTopHalf ? 'top-[110%]' : 'bottom-[110%]'}
+                          ${isTopHalf ? 'bottom-[120%]' : 'top-[120%]'}
                         `}>
                           <p className="text-sm font-medium leading-relaxed opacity-90 relative z-[101]">"{area.description}"</p>
-                          <div className={`absolute left-1/2 -translate-x-1/2 w-4 h-4 bg-[#470082] rotate-45 ${isTopHalf ? '-top-2' : '-bottom-2'}`} />
+                          <div className={`absolute left-1/2 -translate-x-1/2 w-4 h-4 bg-[#470082] rotate-45 ${isTopHalf ? '-bottom-2' : '-top-2'}`} />
                         </div>
                       )}
                     </div>
