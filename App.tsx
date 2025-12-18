@@ -90,8 +90,14 @@ const App: React.FC = () => {
 
       <Grafismo />
 
+      {/* Global Focus Overlay - Covers Header, Footer, and Background */}
+      <div
+        className={`fixed inset-0 bg-[#F5F5F7]/80 backdrop-blur-sm z-[55] transition-opacity duration-500 ${expandedMacroId || activeStrategicPopupId ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        onClick={(e) => { e.stopPropagation(); setExpandedMacroId(null); setActiveStrategicPopupId(null); }}
+      />
+
       {/* Fixed Header - Increased height to ~104px (h-[104px]) */}
-      <header className="w-full h-[104px] bg-[#470082] shadow-lg z-50 flex items-center px-6 md:px-12 fixed top-0">
+      <header className={`w-full h-[104px] bg-[#470082] shadow-lg z-50 flex items-center px-6 md:px-12 fixed top-0 transition-all duration-500 ${expandedMacroId || activeStrategicPopupId ? 'blur-sm opacity-20 pointer-events-none' : ''}`}>
         <div className="w-full max-w-7xl mx-auto flex items-center relative">
           <div className="absolute left-1/2 -translate-x-1/2 cursor-pointer transition-transform hover:scale-105" onClick={(e) => { e.stopPropagation(); setShowCommittees(false); setExpandedMacroId(null); }}>
             <Logo color="#fff" />
@@ -115,7 +121,7 @@ const App: React.FC = () => {
       </header>
 
       {/* Main Content Area - pt-[180px] to increase space from the menu */}
-      <main className="flex-1 w-full max-w-7xl flex flex-col items-center pt-[180px] pb-12 px-6 md:px-12 relative z-10">
+      <main className={`flex-1 w-full max-w-7xl flex flex-col items-center pt-[180px] pb-12 px-6 md:px-12 relative transition-all duration-500 ${activeStrategicPopupId ? 'z-[60]' : 'z-10'}`}>
 
         {!showCommittees ? (
           <>
@@ -174,13 +180,7 @@ const App: React.FC = () => {
             <div className="hidden md:flex relative w-full min-h-[850px] items-center justify-center overflow-visible">
 
               {/* Overlay for Focus Mode (Dims background when a Macro Area is expanded) */}
-              <div
-                className={`
-                  absolute inset-0 bg-[#F5F5F7]/80 backdrop-blur-sm z-30 transition-opacity duration-500
-                  ${expandedMacroId ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}
-                `}
-                onClick={(e) => { e.stopPropagation(); setExpandedMacroId(null); }}
-              />
+              {/* Removed internal overlay in favor of global fixed overlay */}
 
               {/* Decorative Orbits (Elliptical) */}
               <div className={`absolute inset-0 flex items-center justify-center pointer-events-none select-none transition-opacity duration-500 ${expandedMacroId ? 'opacity-10' : 'opacity-20'}`}>
@@ -364,7 +364,7 @@ const App: React.FC = () => {
       </main>
 
       {/* Footer - Redesigned to be "Organograma  |  METARH" in specified color and 20% smaller font */}
-      <footer className="w-full py-6 flex flex-col items-center bg-white border-t border-slate-100 mt-auto relative z-20">
+      <footer className={`w-full py-6 flex flex-col items-center bg-white border-t border-slate-100 mt-auto relative z-20 transition-all duration-500 ${expandedMacroId || activeStrategicPopupId ? 'blur-sm opacity-20 pointer-events-none' : ''}`}>
         <div className="flex flex-col items-center">
           <div className="flex items-center gap-4 text-[#441176]">
             {/* text-[19px] is ~20% smaller than 24px (text-2xl) */}
