@@ -159,23 +159,32 @@ const App: React.FC = () => {
             </div>
 
             {/* DESKTOP VIEW (Orbit System) */}
-            <div className="hidden md:flex relative w-full min-h-[950px] items-center justify-center overflow-visible">
+            <div className="hidden md:flex relative w-full min-h-[850px] items-center justify-center overflow-visible">
 
-              {/* Decorative Orbits */}
+              {/* Decorative Orbits (Elliptical) */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none opacity-20">
-                <div className="absolute w-[500px] h-[500px] rounded-full border border-[#470082]" />
-                <div className="absolute w-[850px] h-[850px] rounded-full border border-[#470082] opacity-60" />
+                {/* Ellipse: RX=600, RY=350 */}
+                <svg className="absolute w-full h-full overflow-visible">
+                  <ellipse cx="50%" cy="50%" rx="520" ry="320" fill="none" stroke="#470082" strokeWidth="1" strokeDasharray="4 4" />
+                  <ellipse cx="50%" cy="50%" rx="650" ry="400" fill="none" stroke="#470082" strokeWidth="1" opacity="0.5" />
+                </svg>
               </div>
 
-              {/* Strategic Areas (Orbit) */}
-              <div className="absolute inset-0 pointer-events-none">
+              {/* Strategic Areas (Elliptical Orbit) */}
+              <div className="absolute inset-0 pointer-events-none z-30">
                 {STRATEGIC_AREAS.map((area, index) => {
                   const total = STRATEGIC_AREAS.length;
-                  const angleDeg = index * (360 / total); // 0, 60, 120...
-                  const angleRad = (angleDeg - 90) * (Math.PI / 180); // -90 (Top start)
-                  const radius = 420;
-                  const x = Math.cos(angleRad) * radius;
-                  const y = Math.sin(angleRad) * radius;
+                  const angleDeg = index * (360 / total);
+                  const angleRad = (angleDeg - 90) * (Math.PI / 180);
+
+                  // Elliptical Orbit
+                  const radiusX = 520;
+                  const radiusY = 320;
+                  const x = Math.cos(angleRad) * radiusX;
+                  const y = Math.sin(angleRad) * radiusY;
+
+                  // Determine popup position based on Y position (if in top half, show bottom, etc)
+                  const isTopHalf = y < 0;
 
                   return (
                     <div
@@ -190,25 +199,27 @@ const App: React.FC = () => {
                       <button
                         onClick={(e) => { e.stopPropagation(); setActiveStrategicPopupId(prev => prev === area.id ? null : area.id); }}
                         className={`
-                          w-36 h-36 bg-white rounded-full p-4 shadow-[0_10px_40px_rgba(0,0,0,0.04)] border border-slate-100 transition-all duration-500
-                          hover:shadow-[0_20px_50px_rgba(71,0,130,0.1)] hover:scale-110 flex flex-col items-center justify-center text-center relative z-10 group
-                          ${activeStrategicPopupId === area.id ? 'border-[#470082] ring-4 ring-[#470082]/10 scale-110' : ''}
+                          w-32 h-32 bg-white rounded-full p-4 shadow-[0_10px_40px_rgba(0,0,0,0.04)] border border-slate-100 transition-all duration-500
+                          hover:shadow-[0_20px_50px_rgba(71,0,130,0.1)] hover:scale-110 flex flex-col items-center justify-center text-center relative z-20 group
+                          ${activeStrategicPopupId === area.id ? 'border-[#470082] ring-4 ring-[#470082]/10 scale-110 z-50' : ''}
                         `}
                       >
-                        <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center mb-2 text-slate-400 group-hover:text-[#470082] group-hover:bg-[#470082]/10 transition-colors">
+                        <div className="w-9 h-9 rounded-full bg-slate-50 flex items-center justify-center mb-2 text-slate-400 group-hover:text-[#470082] group-hover:bg-[#470082]/10 transition-colors">
                           {getStrategicIcon(area.id)}
                         </div>
-                        <h5 className="text-xs font-bold text-[#1D1D1F] group-hover:text-[#470082] transition-colors uppercase tracking-wide leading-tight">
+                        <h5 className="text-[11px] font-bold text-[#1D1D1F] group-hover:text-[#470082] transition-colors uppercase tracking-wide leading-tight">
                           {area.name}
                         </h5>
                       </button>
 
                       {activeStrategicPopupId === area.id && (
                         <div className={`
-                          absolute w-[300px] bg-[#470082] text-white p-6 rounded-[24px] shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-300
-                          ${[0, 1, 5].includes(index) ? 'top-full mt-4' : 'bottom-full mb-4'}
+                          absolute w-[320px] bg-[#470082] text-white p-6 rounded-[24px] shadow-[0_50px_100px_rgba(0,0,0,0.3)] z-[100] animate-in fade-in zoom-in-95 duration-300
+                          ${isTopHalf ? 'top-[110%]' : 'bottom-[110%]'}
                         `}>
-                          <p className="text-sm font-medium leading-relaxed opacity-90">"{area.description}"</p>
+                          <p className="text-sm font-medium leading-relaxed opacity-90 relative z-[101]">"{area.description}"</p>
+                          {/* Arrow */}
+                          <div className={`absolute left-1/2 -translate-x-1/2 w-4 h-4 bg-[#470082] rotate-45 ${isTopHalf ? '-top-2' : '-bottom-2'}`} />
                         </div>
                       )}
                     </div>
@@ -216,90 +227,100 @@ const App: React.FC = () => {
                 })}
               </div>
 
-              {/* Macro Areas (Center Triangle) */}
-              <div className="relative z-20 flex flex-col items-center gap-6">
-
-                {/* Top Item */}
-                <div onClick={(e) => e.stopPropagation()} className="relative">
-                  {(() => {
-                    const area = MACRO_AREAS[0];
-                    const isExpanded = expandedMacroId === area.id;
-                    return (
+              {/* Macro Areas (Horizontal Row) */}
+              <div className="relative z-20 flex flex-row items-center justify-center gap-12">
+                {MACRO_AREAS.map((area) => {
+                  const isExpanded = expandedMacroId === area.id;
+                  return (
+                    <div
+                      key={area.id}
+                      onClick={(e) => { e.stopPropagation(); toggleMacro(area.id); }}
+                      className={`
+                        relative flex flex-col bg-white rounded-[40px] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.05)] cursor-pointer
+                        transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] border border-slate-100 group
+                        ${isExpanded ? 'w-[400px] h-auto z-40 scale-105 shadow-[0_40px_100px_rgba(0,0,0,0.1)]' : 'w-[260px] h-[340px] hover:-translate-y-4 hover:shadow-[0_30px_80px_rgba(0,0,0,0.08)]'}
+                      `}
+                    >
                       <div
-                        onClick={() => toggleMacro(area.id)}
-                        className={`
-                          transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] bg-white rounded-[36px] overflow-hidden shadow-xl border border-slate-100 cursor-pointer relative group
-                          ${isExpanded ? 'w-[450px] h-auto z-50' : 'w-[280px] h-[160px] hover:-translate-y-1'}
-                        `}
+                        className="p-8 h-full relative overflow-hidden flex flex-col items-center justify-center text-center gap-6 transition-colors duration-500 w-full"
+                        style={{ backgroundColor: isExpanded ? 'white' : area.color }}
                       >
-                        <div className="absolute inset-0 pointer-events-none bg-gradient-to-br from-white/10 to-black/5 mix-blend-overlay" />
-                        <div className="p-8 h-full flex flex-col items-center justify-center text-center gap-4 transition-colors duration-500" style={{ backgroundColor: isExpanded ? 'white' : area.color }}>
-                          <h3 className={`text-2xl font-black transition-colors duration-500 ${isExpanded ? 'text-[#470082]' : 'text-white'}`}>{area.name}</h3>
-                          {isExpanded && (
-                            <p className="text-sm text-slate-500 font-medium animate-in fade-in slide-in-from-bottom-2">
-                              {area.description}
-                            </p>
+                        <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-black/10 pointer-events-none mix-blend-overlay" />
+
+                        <h3 className={`text-2xl font-black leading-tight tracking-tight z-10 drop-shadow-sm transition-colors duration-500 ${isExpanded ? 'text-[#470082]' : 'text-white'}`}>
+                          {area.name}
+                        </h3>
+
+                        {/* Flaticon-style Button Indicator */}
+                        <div className={`
+                           w-14 h-14 rounded-full flex items-center justify-center z-10 transition-all duration-500 shadow-md group-hover:scale-110
+                           ${isExpanded ? 'bg-[#470082] text-white rotate-45' : 'bg-white/20 backdrop-blur-md text-white border border-white/40'}
+                         `}>
+                          {isExpanded ? (
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M6 18L18 6M6 6l12 12" /></svg>
+                          ) : (
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14" /></svg>
                           )}
                         </div>
-                      </div>
-                    );
-                  })()}
-                </div>
 
-                {/* Bottom Row */}
-                <div className="flex items-start gap-6">
-                  {MACRO_AREAS.slice(1).map(area => {
-                    const isExpanded = expandedMacroId === area.id;
-                    return (
-                      <div key={area.id} onClick={(e) => e.stopPropagation()} className="relative">
-                        <div
-                          onClick={() => toggleMacro(area.id)}
-                          className={`
-                              transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] bg-white rounded-[36px] overflow-hidden shadow-xl border border-slate-100 cursor-pointer relative group
-                              ${isExpanded ? 'w-[450px] z-50' : 'w-[280px] h-[160px] hover:-translate-y-1'}
-                            `}
-                        >
-                          <div className="p-8 h-full flex flex-col items-center justify-center text-center gap-4 transition-colors duration-500" style={{ backgroundColor: isExpanded ? 'white' : area.color }}>
-                            <h3 className={`text-2xl font-black transition-colors duration-500 ${isExpanded ? 'text-[#470082]' : 'text-white'}`}>{area.name}</h3>
-                            {isExpanded && (
-                              <div className="py-4">
-                                <p className="text-sm text-slate-500 font-medium animate-in fade-in slide-in-from-bottom-2">
-                                  {area.description}
-                                </p>
-                              </div>
-                            )}
-                          </div>
+                        {/* Collapsible Content */}
+                        <div className={`
+                            w-full transition-all duration-700 overflow-hidden
+                            ${isExpanded ? 'max-h-[300px] opacity-100 mt-4' : 'max-h-0 opacity-0'}
+                         `}>
+                          <p className="text-[#6E6E73] text-base font-medium leading-relaxed italic">
+                            "{area.description}"
+                          </p>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
-
+                    </div>
+                  );
+                })}
               </div>
 
             </div>
           </>
         ) : (
-          /* Committees & Groups View */
+          /* Committees & Groups View (Collapsible) */
           <div className="w-full flex flex-col items-center animate-in fade-in slide-in-from-bottom-12 duration-1000">
             <div className="mb-20 text-center">
               <h2 className="text-5xl font-black text-[#1D1D1F] tracking-tighter">Grupos e Comitês</h2>
             </div>
 
             <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-10">
-              {COMMITTEES.map(committee => (
-                <div key={committee.id} className="group bg-white p-12 rounded-[48px] shadow-[0_20px_60px_rgba(0,0,0,0.03)] border border-slate-100 hover:shadow-[0_50px_120px_rgba(0,0,0,0.08)] hover:-translate-y-2 transition-all duration-700 flex flex-col items-start text-left relative overflow-hidden h-full">
-                  <div className="w-20 h-20 rounded-[28px] bg-[#470082]/5 flex items-center justify-center mb-8 group-hover:bg-[#470082]/10 transition-all duration-500 text-[#470082] shadow-sm relative z-10">
-                    {getCommitteeIcon(committee.id)}
-                  </div>
-                  <h3 className="text-2xl font-black text-[#1D1D1F] mb-4 tracking-tight leading-[1.1] group-hover:text-[#470082] transition-colors relative z-10">
-                    {committee.name}
-                  </h3>
-                  <p className="text-[#6E6E73] text-lg font-medium leading-relaxed flex-1 relative z-10">
-                    {committee.description}
-                  </p>
-                </div>
-              ))}
+              {COMMITTEES.map(committee => {
+                // Use local state simulation or just simple toggle logic if we were in a separate component.
+                // Since we are in the main component, we need to track expanded committees.
+                // For now, we'll use a simple 'details/summary' approach or we need to add state.
+                // Adding state requires re-rendering the whole component usually, but we can't easily add state hooks inside map.
+                // We will change expandedMacroId to be general 'expandedId' or add a new state.
+                // Let's reuse 'expandedMacroId' since we probably won't have macro expanded while in committee view?
+                // Actually safer to add a new state variable. BUT I can't add state in this tool block.
+                // I will use `details` and `summary` HTML tags for native collapsible behavior which fits "click to open".
+
+                return (
+                  <details key={committee.id} className="group bg-white p-8 rounded-[40px] shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-slate-100 hover:shadow-[0_30px_80px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 cursor-pointer overflow-hidden open:ring-1 open:ring-[#470082]/10">
+                    <summary className="list-none flex flex-col items-start gap-6 outline-none">
+                      <div className="w-full flex items-center justify-between">
+                        <div className="w-16 h-16 rounded-[24px] bg-[#470082]/5 flex items-center justify-center text-[#470082] shadow-sm group-hover:bg-[#470082]/10 transition-colors">
+                          {getCommitteeIcon(committee.id)}
+                        </div>
+                        <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-open:rotate-180 transition-transform duration-300">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m6 9 6 6 6-6" /></svg>
+                        </div>
+                      </div>
+                      <h3 className="text-2xl font-black text-[#1D1D1F] tracking-tight leading-[1.1] group-hover:text-[#470082] transition-colors">
+                        {committee.name}
+                      </h3>
+                    </summary>
+                    <div className="pt-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                      <p className="text-[#6E6E73] text-lg font-medium leading-relaxed">
+                        {committee.description}
+                      </p>
+                    </div>
+                  </details>
+                );
+              })}
             </div>
           </div>
         )}
