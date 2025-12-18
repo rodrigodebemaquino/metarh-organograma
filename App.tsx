@@ -173,15 +173,24 @@ const App: React.FC = () => {
             {/* DESKTOP VIEW (Orbit System) */}
             <div className="hidden md:flex relative w-full min-h-[850px] items-center justify-center overflow-visible">
 
+              {/* Overlay for Focus Mode (Dims background when a Macro Area is expanded) */}
+              <div
+                className={`
+                  absolute inset-0 bg-[#F5F5F7]/80 backdrop-blur-sm z-30 transition-opacity duration-500
+                  ${expandedMacroId ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}
+                `}
+                onClick={(e) => { e.stopPropagation(); setExpandedMacroId(null); }}
+              />
+
               {/* Decorative Orbits (Elliptical) */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none opacity-20">
+              <div className={`absolute inset-0 flex items-center justify-center pointer-events-none select-none transition-opacity duration-500 ${expandedMacroId ? 'opacity-10' : 'opacity-20'}`}>
                 <svg className="absolute w-full h-full overflow-visible">
                   <ellipse cx="50%" cy="50%" rx="600" ry="340" fill="none" stroke="#470082" strokeWidth="1" strokeDasharray="4 4" />
                 </svg>
               </div>
 
               {/* Strategic Areas (Orbiting with 3 Top / 3 Bottom) */}
-              <div className="absolute inset-0 pointer-events-none z-30">
+              <div className={`absolute inset-0 z-30 transition-all duration-500 ${expandedMacroId ? 'blur-sm scale-95 opacity-50 pointer-events-none' : 'pointer-events-none'}`}>
                 {STRATEGIC_AREAS.map((area, index) => {
                   // Tighter grouping angles: Top (-125, -90, -55), Bottom (55, 90, 125)
                   const angles = [-125, -90, -55, 55, 90, 125];
@@ -206,7 +215,11 @@ const App: React.FC = () => {
                       }}
                     >
                       <button
-                        onClick={(e) => { e.stopPropagation(); setActiveStrategicPopupId(prev => prev === area.id ? null : area.id); }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExpandedMacroId(null);
+                          setActiveStrategicPopupId(prev => prev === area.id ? null : area.id);
+                        }}
                         className={`
                           w-32 h-32 bg-white rounded-full p-4 shadow-[0_10px_40px_rgba(0,0,0,0.04)] border border-slate-100 transition-all duration-500
                           hover:shadow-[0_20px_50px_rgba(71,0,130,0.1)] hover:scale-110 flex flex-col items-center justify-center text-center relative z-20 group
@@ -236,17 +249,21 @@ const App: React.FC = () => {
               </div>
 
               {/* Macro Areas (Horizontal Row, Collapsible Height) */}
-              <div className="relative z-20 flex flex-row items-start justify-center gap-8 h-[500px] items-center">
+              <div className="relative z-40 flex flex-row items-start justify-center gap-8 h-[500px] items-center">
                 {MACRO_AREAS.map((area) => {
                   const isExpanded = expandedMacroId === area.id;
                   return (
                     <div
                       key={area.id}
-                      onClick={(e) => { e.stopPropagation(); toggleMacro(area.id); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveStrategicPopupId(null);
+                        toggleMacro(area.id);
+                      }}
                       className={`
                         relative flex flex-col bg-white rounded-[40px] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.05)] cursor-pointer
                         transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] border border-slate-100 group
-                        ${isExpanded ? 'w-[280px] h-auto z-40 scale-105 shadow-[0_40px_100px_rgba(0,0,0,0.1)]' : 'w-[280px] h-[220px] hover:-translate-y-2 hover:shadow-[0_30px_80px_rgba(0,0,0,0.08)]'}
+                        ${isExpanded ? 'w-[280px] h-auto z-50 scale-105 shadow-[0_40px_100px_rgba(0,0,0,0.2)] ring-1 ring-[#470082]/20' : `w-[280px] h-[220px] hover:-translate-y-2 hover:shadow-[0_30px_80px_rgba(0,0,0,0.08)] ${expandedMacroId ? 'opacity-40 grayscale blur-[1px]' : ''}`}
                       `}
                     >
                       <div
