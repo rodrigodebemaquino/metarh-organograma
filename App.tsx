@@ -71,9 +71,14 @@ const App: React.FC = () => {
   const [expandedMacroId, setExpandedMacroId] = useState<string | null>(null);
   const [activeStrategicPopupId, setActiveStrategicPopupId] = useState<string | null>(null);
   const [showCommittees, setShowCommittees] = useState(false);
+  const [expandedCommitteeId, setExpandedCommitteeId] = useState<string | null>(null);
 
   const toggleMacro = (id: string) => {
     setExpandedMacroId(prev => (prev === id ? null : id));
+  };
+
+  const toggleCommittee = (id: string) => {
+    setExpandedCommitteeId(prev => (prev === id ? null : id));
   };
 
   const closePopups = () => {
@@ -87,23 +92,25 @@ const App: React.FC = () => {
 
       {/* Fixed Header - Increased height to ~104px (h-[104px]) */}
       <header className="w-full h-[104px] bg-[#470082] shadow-lg z-50 flex items-center px-6 md:px-12 fixed top-0">
-        <div className="w-full max-w-7xl mx-auto flex justify-between items-center">
-          <div className="cursor-pointer transition-transform hover:scale-105" onClick={(e) => { e.stopPropagation(); setShowCommittees(false); setExpandedMacroId(null); }}>
+        <div className="w-full max-w-7xl mx-auto flex items-center relative">
+          <div className="absolute left-1/2 -translate-x-1/2 cursor-pointer transition-transform hover:scale-105" onClick={(e) => { e.stopPropagation(); setShowCommittees(false); setExpandedMacroId(null); }}>
             <Logo color="#fff" />
           </div>
 
-          <button
-            onClick={(e) => { e.stopPropagation(); setShowCommittees(!showCommittees); }}
-            className="group relative px-10 py-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all duration-300 backdrop-blur-md border border-white/20 flex items-center gap-3 overflow-hidden shadow-sm active:scale-95"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-            <span className="text-sm font-black uppercase tracking-widest leading-none">
-              {showCommittees ? 'Organograma' : 'Comitês & Grupos'}
-            </span>
-            <div className={`transition-transform duration-500 ${showCommittees ? 'rotate-180' : ''}`}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m9 18 6-6-6-6" strokeLinecap="round" strokeLinejoin="round" /></svg>
-            </div>
-          </button>
+          <div className="ml-auto">
+            <button
+              onClick={(e) => { e.stopPropagation(); setShowCommittees(!showCommittees); }}
+              className="group relative px-10 py-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all duration-300 backdrop-blur-md border border-white/20 flex items-center gap-3 overflow-hidden shadow-sm active:scale-95"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+              <span className="text-sm font-black uppercase tracking-widest leading-none">
+                {showCommittees ? 'Organograma' : 'Comitês & Grupos'}
+              </span>
+              <div className={`transition-transform duration-500 ${showCommittees ? 'rotate-180' : ''}`}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m9 18 6-6-6-6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+              </div>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -131,9 +138,14 @@ const App: React.FC = () => {
                         className="p-8 relative overflow-hidden flex items-center justify-between min-h-[120px]"
                         style={{ backgroundColor: area.color }}
                       >
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/15 to-black/5 pointer-events-none" />
                         <h3 className="text-xl font-black text-white z-10">{area.name}</h3>
-                        <div className={`w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center z-10 transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><path d="m6 9 6 6 6-6" /></svg>
+                        <div className={`w-10 h-10 rounded-full bg-white/20 flex items-center justify-center z-10 transition-transform duration-300 ${isExpanded ? 'rotate-45 bg-[#470082] text-white' : 'text-white'}`}>
+                          {isExpanded ? (
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M6 18L18 6M6 6l12 12" /></svg>
+                          ) : (
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M12 5v14M5 12h14" /></svg>
+                          )}
                         </div>
                       </div>
                       {isExpanded && (
@@ -163,27 +175,28 @@ const App: React.FC = () => {
 
               {/* Decorative Orbits (Elliptical) */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none opacity-20">
-                {/* Ellipse: RX=600, RY=350 */}
                 <svg className="absolute w-full h-full overflow-visible">
-                  <ellipse cx="50%" cy="50%" rx="520" ry="320" fill="none" stroke="#470082" strokeWidth="1" strokeDasharray="4 4" />
-                  <ellipse cx="50%" cy="50%" rx="650" ry="400" fill="none" stroke="#470082" strokeWidth="1" opacity="0.5" />
+                  <ellipse cx="50%" cy="50%" rx="600" ry="400" fill="none" stroke="#470082" strokeWidth="1" strokeDasharray="4 4" />
                 </svg>
               </div>
 
-              {/* Strategic Areas (Elliptical Orbit) */}
+              {/* Strategic Areas (Orbiting with 3 Top / 3 Bottom) */}
               <div className="absolute inset-0 pointer-events-none z-30">
                 {STRATEGIC_AREAS.map((area, index) => {
-                  const total = STRATEGIC_AREAS.length;
-                  const angleDeg = index * (360 / total);
-                  const angleRad = (angleDeg - 90) * (Math.PI / 180);
+                  // Fixed Angles: 3 Top (-150, -90, -30), 3 Bottom (150, 90, 30)
+                  const angles = [-150, -90, -30, 30, 90, 150];
+                  // Map indices to these angles clearly.
+                  // Indices: 0->-150, 1->-90, 2->-30 (Top Left to Right)
+                  // Indices: 3->30, 4->90, 5->150 (Bottom Right to Left? Or 150->90->30?)
+                  // Let's layout: Top Left (-150), Top (-90), Top Right (-30). Bottom Right (30), Bottom (90), Bottom Left (150).
+                  const currentAngleDeg = angles[index % 6];
+                  const angleRad = (currentAngleDeg) * (Math.PI / 180);
 
-                  // Elliptical Orbit
-                  const radiusX = 520;
-                  const radiusY = 320;
+                  const radiusX = 600;
+                  const radiusY = 400;
                   const x = Math.cos(angleRad) * radiusX;
                   const y = Math.sin(angleRad) * radiusY;
 
-                  // Determine popup position based on Y position (if in top half, show bottom, etc)
                   const isTopHalf = y < 0;
 
                   return (
@@ -218,7 +231,6 @@ const App: React.FC = () => {
                           ${isTopHalf ? 'top-[110%]' : 'bottom-[110%]'}
                         `}>
                           <p className="text-sm font-medium leading-relaxed opacity-90 relative z-[101]">"{area.description}"</p>
-                          {/* Arrow */}
                           <div className={`absolute left-1/2 -translate-x-1/2 w-4 h-4 bg-[#470082] rotate-45 ${isTopHalf ? '-top-2' : '-bottom-2'}`} />
                         </div>
                       )}
@@ -227,8 +239,8 @@ const App: React.FC = () => {
                 })}
               </div>
 
-              {/* Macro Areas (Horizontal Row) */}
-              <div className="relative z-20 flex flex-row items-center justify-center gap-12">
+              {/* Macro Areas (Horizontal Row, Collapsible Height) */}
+              <div className="relative z-20 flex flex-row items-start justify-center gap-8 h-[500px] items-center">
                 {MACRO_AREAS.map((area) => {
                   const isExpanded = expandedMacroId === area.id;
                   return (
@@ -238,35 +250,32 @@ const App: React.FC = () => {
                       className={`
                         relative flex flex-col bg-white rounded-[40px] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.05)] cursor-pointer
                         transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] border border-slate-100 group
-                        ${isExpanded ? 'w-[400px] h-auto z-40 scale-105 shadow-[0_40px_100px_rgba(0,0,0,0.1)]' : 'w-[260px] h-[340px] hover:-translate-y-4 hover:shadow-[0_30px_80px_rgba(0,0,0,0.08)]'}
+                        ${isExpanded ? 'w-[280px] h-auto z-40 scale-105 shadow-[0_40px_100px_rgba(0,0,0,0.1)]' : 'w-[280px] h-[360px] hover:-translate-y-2 hover:shadow-[0_30px_80px_rgba(0,0,0,0.08)]'}
                       `}
                     >
                       <div
-                        className="p-8 h-full relative overflow-hidden flex flex-col items-center justify-center text-center gap-6 transition-colors duration-500 w-full"
+                        className={`
+                          p-8 relative overflow-hidden flex flex-col items-center text-center gap-6 w-full h-full
+                        `}
                         style={{ backgroundColor: isExpanded ? 'white' : area.color }}
                       >
                         <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-black/10 pointer-events-none mix-blend-overlay" />
 
-                        <h3 className={`text-2xl font-black leading-tight tracking-tight z-10 drop-shadow-sm transition-colors duration-500 ${isExpanded ? 'text-[#470082]' : 'text-white'}`}>
+                        <h3 className={`text-2xl font-black leading-tight tracking-tight z-10 drop-shadow-sm transition-colors duration-500 mt-auto mb-4 ${isExpanded ? 'text-[#470082]' : 'text-white'}`}>
                           {area.name}
                         </h3>
 
-                        {/* Flaticon-style Button Indicator */}
                         <div className={`
-                           w-14 h-14 rounded-full flex items-center justify-center z-10 transition-all duration-500 shadow-md group-hover:scale-110
+                           w-14 h-14 rounded-full flex items-center justify-center z-10 transition-all duration-500 shadow-md group-hover:scale-110 mb-auto
                            ${isExpanded ? 'bg-[#470082] text-white rotate-45' : 'bg-white/20 backdrop-blur-md text-white border border-white/40'}
                          `}>
-                          {isExpanded ? (
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M6 18L18 6M6 6l12 12" /></svg>
-                          ) : (
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14" /></svg>
-                          )}
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14" /></svg>
                         </div>
 
                         {/* Collapsible Content */}
                         <div className={`
                             w-full transition-all duration-700 overflow-hidden
-                            ${isExpanded ? 'max-h-[300px] opacity-100 mt-4' : 'max-h-0 opacity-0'}
+                            ${isExpanded ? 'max-h-[500px] opacity-100 mt-0 pb-2' : 'max-h-0 opacity-0'}
                          `}>
                           <p className="text-[#6E6E73] text-base font-medium leading-relaxed italic">
                             "{area.description}"
@@ -281,7 +290,7 @@ const App: React.FC = () => {
             </div>
           </>
         ) : (
-          /* Committees & Groups View (Collapsible) */
+          /* Committees & Groups View (Exclusive Accordion) */
           <div className="w-full flex flex-col items-center animate-in fade-in slide-in-from-bottom-12 duration-1000">
             <div className="mb-20 text-center">
               <h2 className="text-5xl font-black text-[#1D1D1F] tracking-tighter">Grupos e Comitês</h2>
@@ -289,36 +298,40 @@ const App: React.FC = () => {
 
             <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-10">
               {COMMITTEES.map(committee => {
-                // Use local state simulation or just simple toggle logic if we were in a separate component.
-                // Since we are in the main component, we need to track expanded committees.
-                // For now, we'll use a simple 'details/summary' approach or we need to add state.
-                // Adding state requires re-rendering the whole component usually, but we can't easily add state hooks inside map.
-                // We will change expandedMacroId to be general 'expandedId' or add a new state.
-                // Let's reuse 'expandedMacroId' since we probably won't have macro expanded while in committee view?
-                // Actually safer to add a new state variable. BUT I can't add state in this tool block.
-                // I will use `details` and `summary` HTML tags for native collapsible behavior which fits "click to open".
-
+                const isOpen = expandedCommitteeId === committee.id;
                 return (
-                  <details key={committee.id} className="group bg-white p-8 rounded-[40px] shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-slate-100 hover:shadow-[0_30px_80px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 cursor-pointer overflow-hidden open:ring-1 open:ring-[#470082]/10">
-                    <summary className="list-none flex flex-col items-start gap-6 outline-none">
+                  <div
+                    key={committee.id}
+                    className={`
+                      group bg-white p-8 rounded-[40px] shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-slate-100 
+                      hover:shadow-[0_30px_80px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-500 cursor-pointer overflow-hidden
+                      ${isOpen ? 'ring-1 ring-[#470082]/10 shadow-[0_40px_90px_rgba(0,0,0,0.06)]' : ''}
+                    `}
+                    onClick={(e) => { e.stopPropagation(); toggleCommittee(committee.id); }}
+                  >
+                    <div className="flex flex-col items-start gap-6">
                       <div className="w-full flex items-center justify-between">
                         <div className="w-16 h-16 rounded-[24px] bg-[#470082]/5 flex items-center justify-center text-[#470082] shadow-sm group-hover:bg-[#470082]/10 transition-colors">
                           {getCommitteeIcon(committee.id)}
                         </div>
-                        <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-open:rotate-180 transition-transform duration-300">
+                        <div className={`w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 transition-transform duration-500 ${isOpen ? 'rotate-180' : ''}`}>
                           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m6 9 6 6 6-6" /></svg>
                         </div>
                       </div>
                       <h3 className="text-2xl font-black text-[#1D1D1F] tracking-tight leading-[1.1] group-hover:text-[#470082] transition-colors">
                         {committee.name}
                       </h3>
-                    </summary>
-                    <div className="pt-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                    </div>
+
+                    <div className={`
+                      transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] overflow-hidden
+                      ${isOpen ? 'max-h-[300px] opacity-100 pt-6' : 'max-h-0 opacity-0'}
+                    `}>
                       <p className="text-[#6E6E73] text-lg font-medium leading-relaxed">
                         {committee.description}
                       </p>
                     </div>
-                  </details>
+                  </div>
                 );
               })}
             </div>
