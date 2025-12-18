@@ -121,7 +121,7 @@ const App: React.FC = () => {
       </header>
 
       {/* Main Content Area - pt-[320px] to increase space from the menu and avoid top popup clipping */}
-      <main className={`flex-1 w-full max-w-7xl flex flex-col items-center pt-[320px] pb-12 px-6 md:px-12 relative transition-all duration-500 ${activeStrategicPopupId || expandedMacroId ? 'z-[60]' : 'z-10'}`}>
+      <main className={`flex-1 w-full max-w-7xl flex flex-col items-center pt-[320px] pb-[320px] px-6 md:px-12 relative transition-all duration-500 ${activeStrategicPopupId || expandedMacroId ? 'z-[60]' : 'z-10'}`}>
 
         {!showCommittees ? (
           <>
@@ -320,7 +320,7 @@ const App: React.FC = () => {
               <h2 className="text-5xl font-black text-[#1D1D1F] tracking-tighter">Grupos e Comitês</h2>
             </div>
 
-            <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-10 items-start">
               {COMMITTEES.map(committee => {
                 const isOpen = expandedCommitteeId === committee.id;
                 return (
