@@ -190,7 +190,7 @@ const App: React.FC = () => {
               </div>
 
               {/* Strategic Areas (Orbiting with 3 Top / 3 Bottom) */}
-              <div className={`absolute inset-0 z-30 transition-all duration-500 ${expandedMacroId ? 'blur-sm scale-95 opacity-50 pointer-events-none' : 'pointer-events-none'}`}>
+              <div className={`absolute inset-0 transition-all duration-500 ${expandedMacroId ? 'blur-sm scale-95 opacity-50 pointer-events-none z-30' : 'pointer-events-none'} ${activeStrategicPopupId ? 'z-60' : 'z-30'}`}>
                 {STRATEGIC_AREAS.map((area, index) => {
                   // Tighter grouping angles: Top (-125, -90, -55), Bottom (55, 90, 125)
                   const angles = [-125, -90, -55, 55, 90, 125];
@@ -342,7 +342,7 @@ const App: React.FC = () => {
                           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m6 9 6 6 6-6" /></svg>
                         </div>
                       </div>
-                      <h3 className="text-2xl font-black text-[#1D1D1F] tracking-tight leading-[1.1] group-hover:text-[#470082] transition-colors">
+                      <h3 className="text-2xl font-bold text-[#1D1D1F] tracking-tight leading-[1.1] group-hover:text-[#470082] transition-colors">
                         {committee.name}
                       </h3>
                     </div>
@@ -351,7 +351,7 @@ const App: React.FC = () => {
                       transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] overflow-hidden
                       ${isOpen ? 'max-h-[300px] opacity-100 pt-6' : 'max-h-0 opacity-0'}
                     `}>
-                      <p className="text-[#6E6E73] text-lg font-medium leading-relaxed">
+                      <p className="text-[#6E6E73] text-lg font-normal leading-relaxed">
                         {committee.description}
                       </p>
                     </div>
