@@ -120,8 +120,8 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      {/* Main Content Area - pt-[180px] to increase space from the menu */}
-      <main className={`flex-1 w-full max-w-7xl flex flex-col items-center pt-[180px] pb-12 px-6 md:px-12 relative transition-all duration-500 ${activeStrategicPopupId ? 'z-[60]' : 'z-10'}`}>
+      {/* Main Content Area - pt-[320px] to increase space from the menu and avoid top popup clipping */}
+      <main className={`flex-1 w-full max-w-7xl flex flex-col items-center pt-[320px] pb-12 px-6 md:px-12 relative transition-all duration-500 ${activeStrategicPopupId || expandedMacroId ? 'z-[60]' : 'z-10'}`}>
 
         {!showCommittees ? (
           <>
